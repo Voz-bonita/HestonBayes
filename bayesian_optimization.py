@@ -31,6 +31,13 @@ def estimate_heston(S: pd.Series, dt, ns, N):
     # mu_prior_jump = -0.96
     # sigma_prior_jump = 0.3
 
+    parameters_sample = {
+        "mu": np.zeros(ns),
+        "kappa": np.zeros(ns),
+        "theta": np.zeros(ns),
+        "sigma": np.zeros(ns),
+        "rho": np.zeros(ns),
+    }
     R = S[1:] / S[:-1]
 
     for i in ns:  # MCMC
@@ -39,7 +46,10 @@ def estimate_heston(S: pd.Series, dt, ns, N):
                 particle_filtering()
         sample_parameters()
 
-    return  # parameter estimates
+    mc_estimates = {
+        parameter: np.mean(sample) for parameter, sample in parameters_sample.items()
+    }
+    return mc_estimates
 
 
 def eta_to_mu(eta):
