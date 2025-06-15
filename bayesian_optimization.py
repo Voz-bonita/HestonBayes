@@ -10,6 +10,23 @@ def particle_filtering():
     pass
 
 
+def eta_to_mu(eta):
+    return (eta - 1) / dt
+
+
+def sample_mu(rt: np.ndarray, vt: np.ndarray, dt: float, mu_eta_prior, tau_eta_prior):
+    xt = 1 / dt / np.sqrt(vt)
+    yt = xt * rt
+
+    inner_x = xt.T @ xt  # scalar
+    tau_eta = inner_x + tau_eta_prior
+    ols_eta = 1 / inner_x * (xt.T @ yt)
+    mu_eta = 1 / tau_eta * (tau_eta_prior * mu_eta_prior + inner_x * ols_eta)
+
+    eta = stats.norm.rvs(loc=mu_eta, scale=np.sqrt(tau_eta))
+    return eta_to_mu(eta)
+
+
 def sample_parameters():
     pass
 
@@ -50,10 +67,6 @@ def estimate_heston(S: pd.Series, dt, ns, N):
         parameter: np.mean(sample) for parameter, sample in parameters_sample.items()
     }
     return mc_estimates
-
-
-def eta_to_mu(eta):
-    return (eta - 1) / dt
 
 
 def beta2_to_kappa(beta2):
