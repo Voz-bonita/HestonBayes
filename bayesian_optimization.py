@@ -1,0 +1,36 @@
+import numpy as np
+from scipy import stats
+
+
+dt = 1
+
+# Gruszka and Szwabiński, 2022
+mu_prior_eta = 1.00125
+sigma_prior_eta = 0.001
+precision_prior_vol = np.array([[10, 0], [0, 5]])
+mu_prior_vol = np.array([35e-6, 0.988])
+a_prior_sigma = 149
+b_prior_sigma = 0.025
+mu_prior_psi = -0.45
+sigma_prior_psi = 0.3
+a_prior_omega = 1.03
+b_prior_omgea = 0.05
+lambda_prior_jump = 0.15
+mu_prior_jump = -0.96
+sigma_prior_jump = 0.3
+
+
+def eta_to_mu(eta):
+    return (eta - 1) / dt
+
+
+def beta2_to_kappa(beta2):
+    return (1 - beta2) / dt
+
+
+def beta1_to_theta(beta1, kappa):
+    return beta1 / kappa / dt
+
+
+def psi_omega_to_rho(psi, omega):
+    return psi / np.sqrt(psi**2 + omega)
