@@ -35,12 +35,15 @@ def beta1_to_theta(beta1, kappa):
     return beta1 / kappa / dt
 
 
-def sample_kappa_theta(
+def sample_kappa_theta_sigma(
     vt: np.ndarray,
     dt: float,
+    n: int,
     mu_beta_prior: np.ndarray,
     precision_beta_prior: np.ndarray,
     sigma2_past: float,
+    a_sigma2_prior: float,
+    b_sigma2_prior: float,
 ):
     xt_2 = 1 / np.sqrt(dt) * np.sqrt(vt[:-1])
     xt_1 = 1 / np.sqrt(dt) / np.sqrt(vt[:-1])
@@ -63,7 +66,15 @@ def sample_kappa_theta(
     kappa = beta2_to_kappa(betas[1])
     theta = beta1_to_theta(betas[0], kappa)
 
-    return kappa, theta
+    a_sigma2 = a_sigma2_prior + n / 2
+    b_sigma2 = b_sigma2_prior + 1 / 2 * (
+        yt.T @ yt
+        + mu_beta_prior.T @ precision_beta_prior @ mu_beta_prior
+        - mu_beta.T @ precision_beta @ mu_beta
+    )
+    sigma2 = stats.invgamma.rvs(loc=a_sigma2, scale=b_sigma2, size=1)
+
+    return kappa, theta, sigma2
 
 
 def sample_parameters():
