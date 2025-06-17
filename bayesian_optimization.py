@@ -77,6 +77,41 @@ def sample_kappa_theta_sigma(
     return kappa, theta, sigma2
 
 
+def psi_omega_to_rho(psi, omega):
+    return psi / np.sqrt(psi**2 + omega)
+
+
+def sample_rho(
+    rt: np.ndarray,
+    vt: np.ndarray,
+    dt: float,
+    mu: float,
+    kappa: float,
+    theta: float,
+    mu_prior_psi,
+    tau_prior_psi,
+    a_prior_omega,
+    b_prior_omega,
+):
+    price_residuals = (rt - mu * dt - 1) / np.sqrt(dt * vt[:-1])
+    volatility_residuals = (
+        vt[1:] - vt[:-1] - kappa * (theta - vt[:-1]) * dt
+    ) / np.sqrt(dt * vt[:-1])
+    residuals = np.array([price_residuals, volatility_residuals]).reshape((-1, 2))
+
+    A = residuals.T @ residuals
+    tau_psi = A[0, 0] + tau_prior_psi
+    mu_psi = (A[0, 1] + mu_prior_psi * tau_prior_psi) / tau_psi
+    a_omega = a_prior_omega + rt.shape[0] / 2
+    b_omega = b_prior_omega + 1 / 2 * (A[1, 1] - A[0, 1] ** 2 / A[0, 0])
+
+    omega = stats.invgamma.rvs(loc=a_omega, scale=b_omega, size=1)
+    psi = stats.norm.rvs(loc=mu_psi, scale=np.sqrt(omega / tau_psi), size=1)
+
+    rho = psi_omega_to_rho(psi, omega)
+    return rho
+
+
 def sample_parameters():
     pass
 
@@ -117,7 +152,3 @@ def estimate_heston(S: pd.Series, dt, ns, N):
         parameter: np.mean(sample) for parameter, sample in parameters_sample.items()
     }
     return mc_estimates
-
-
-def psi_omega_to_rho(psi, omega):
-    return psi / np.sqrt(psi**2 + omega)
