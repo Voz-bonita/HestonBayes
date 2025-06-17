@@ -15,7 +15,7 @@ def eta_to_mu(eta):
 
 
 def sample_mu(rt: np.ndarray, vt: np.ndarray, dt: float, mu_eta_prior, tau_eta_prior):
-    xt = 1 / dt / np.sqrt(vt)
+    xt = 1 / np.sqrt(dt) / np.sqrt(vt)
     yt = xt * rt
 
     inner_x = xt.T @ xt  # scalar
