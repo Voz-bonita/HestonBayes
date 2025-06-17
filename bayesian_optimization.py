@@ -27,6 +27,45 @@ def sample_mu(rt: np.ndarray, vt: np.ndarray, dt: float, mu_eta_prior, tau_eta_p
     return eta_to_mu(eta)
 
 
+def beta2_to_kappa(beta2):
+    return (1 - beta2) / dt
+
+
+def beta1_to_theta(beta1, kappa):
+    return beta1 / kappa / dt
+
+
+def sample_kappa_theta(
+    vt: np.ndarray,
+    dt: float,
+    mu_beta_prior: np.ndarray,
+    precision_beta_prior: np.ndarray,
+    sigma2_past: float,
+):
+    xt_2 = 1 / np.sqrt(dt) * np.sqrt(vt[:-1])
+    xt_1 = 1 / np.sqrt(dt) / np.sqrt(vt[:-1])
+    yt = vt[1:] * xt_1
+
+    xt = np.array([xt_1, xt_2]).reshape((-1, 2))
+
+    gram_matrix = xt.T @ xt
+    inv_gram_matrix = np.linalg.inv(gram_matrix)
+
+    precision_beta = precision_beta_prior + gram_matrix
+    inv_precision_beta = np.linalg.inv(precision_beta)
+
+    ols_beta = inv_gram_matrix @ xt.T @ yt
+    mu_beta = inv_precision_beta @ (
+        precision_beta_prior @ mu_beta_prior + gram_matrix @ ols_beta
+    )
+
+    betas = stats.norm.rvs(loc=mu_beta, scale=sigma2_past * inv_precision_beta, size=2)
+    kappa = beta2_to_kappa(betas[1])
+    theta = beta1_to_theta(betas[0], kappa)
+
+    return kappa, theta
+
+
 def sample_parameters():
     pass
 
@@ -67,14 +106,6 @@ def estimate_heston(S: pd.Series, dt, ns, N):
         parameter: np.mean(sample) for parameter, sample in parameters_sample.items()
     }
     return mc_estimates
-
-
-def beta2_to_kappa(beta2):
-    return (1 - beta2) / dt
-
-
-def beta1_to_theta(beta1, kappa):
-    return beta1 / kappa / dt
 
 
 def psi_omega_to_rho(psi, omega):
