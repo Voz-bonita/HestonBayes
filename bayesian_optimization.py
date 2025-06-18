@@ -6,8 +6,45 @@ from scipy import stats
 dt = 1
 
 
-def particle_filtering():
-    pass
+def particle_filtering(
+    N: int, Rt: np.ndarray, dt, Vt_past, mu, kappa, theta, sigma, rho
+):
+    n = Rt.shape[0]
+    epsilon = stats.norm.rvs(size=n - 1)
+
+    zt = (Rt[1:] - mu * dt - 1) / np.sqrt(dt, Vt_past[:-1])
+    wt = zt * rho + epsilon * np.sqrt(1 - rho**2)
+
+    Vt_candidates = (
+        Vt_past[:-1]
+        + kappa * (theta - Vt_past[:-1]) * dt
+        + sigma * np.sqrt(dt * Vt_past[:-1]) * wt
+    )
+    Wt_prob = (
+        1
+        / np.sqrt(2 * np.pi * Vt_candidates * dt)
+        * np.exp(-1 / 2 * (Rt[1:] * dt - mu * dt - 1) ** 2 / Vt_candidates / dt)
+    )
+    Wt_prob /= np.sum(Wt_prob)
+
+    Ut = np.array([Vt_candidates, Wt_prob]).T
+    Ut_sorted = Ut[Ut[:, 0].argsort()]
+    Wt_sorted_cumsum = np.cumsum(Ut_sorted[:, 1])
+
+    sampled_probabilities = stats.uniform.rvs(size=N)
+    Vt_refined = np.zeros(N)
+    for i, prob in enumerate(sampled_probabilities):
+        j = np.argmax(prob > Wt_sorted_cumsum)
+        W_j = Ut_sorted[j, 1]
+        W_j1 = Ut_sorted[j + 1, 1]
+        V_j = Ut_sorted[j, 0]
+        V_j1 = Ut_sorted[j + 1, 0]
+        v = prob
+        if j > 1:
+            v -= Wt_sorted_cumsum[j - 2] + W_j / 2
+        v = v / (W_j / 2 + W_j1 / 2) * (V_j1 - V_j) + V_j
+        Vt_refined[i] = v
+    return Vt_refined
 
 
 def eta_to_mu(eta):
