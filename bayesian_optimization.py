@@ -201,7 +201,7 @@ def estimate_heston(S: pd.Series, dt, ns, N):
                 parameters_sample["rho"][i],
             )
             vt[k] = np.mean(Vt)
-        vt[n - 1] = vt[n - 2]
+        vt[n] = vt[n - 1]
         sample_parameters()
 
     mc_estimates = {
