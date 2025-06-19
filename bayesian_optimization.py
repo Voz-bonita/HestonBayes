@@ -11,7 +11,7 @@ def particle_filtering(
 ):
     epsilon = stats.norm.rvs(size=N)
 
-    zt = (Rtk - mu * dt - 1) / np.sqrt(dt, Vt_past)
+    zt = (Rtk - mu * dt - 1) / np.sqrt(dt * Vt_past)
     wt = zt * rho + epsilon * np.sqrt(1 - rho**2)
 
     Vt_candidates = (
