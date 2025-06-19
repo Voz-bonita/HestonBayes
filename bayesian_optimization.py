@@ -182,7 +182,7 @@ def estimate_heston(S: pd.Series, dt, ns, N):
 
     R = S[1:] / S[:-1]
 
-    for i in ns:  # MCMC
+    for i in range(ns):  # MCMC
         vt = np.zeros(n)
         Vt = np.repeat([parameters_sample["theta"][i]], N)
         vt[0] = np.mean(Vt)
