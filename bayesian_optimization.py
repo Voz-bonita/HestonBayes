@@ -181,9 +181,10 @@ def estimate_heston(S: pd.Series, dt, ns, N):
     parameters_sample["rho"][0] = -0.1
 
     R = S[1:] / S[:-1]
+    n = len(R)
 
     for i in range(ns):  # MCMC
-        vt = np.zeros(n)
+        vt = np.zeros(n + 1)
         Vt = np.repeat([parameters_sample["theta"][i]], N)
         vt[0] = np.mean(Vt)
         for k in range(1, n - 1):  # Particle Filtering
