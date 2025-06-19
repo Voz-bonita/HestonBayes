@@ -119,7 +119,7 @@ def sample_kappa_theta_sigma(
         + mu_beta_prior.T @ precision_beta_prior @ mu_beta_prior
         - mu_beta.T @ precision_beta @ mu_beta
     )
-    sigma2 = stats.invgamma.rvs(loc=a_sigma2, scale=b_sigma2, size=1)
+    sigma2 = stats.invgamma.rvs(a_sigma2, b_sigma2, size=1)
 
     return kappa, theta, sigma2
 
@@ -152,7 +152,7 @@ def sample_rho(
     a_omega = a_prior_omega + rt.shape[0] / 2
     b_omega = b_prior_omega + 1 / 2 * (A[1, 1] - A[0, 1] ** 2 / A[0, 0])
 
-    omega = stats.invgamma.rvs(loc=a_omega, scale=b_omega, size=1)
+    omega = stats.invgamma.rvs(a_omega, b_omega, size=1)
     psi = stats.norm.rvs(loc=mu_psi, scale=np.sqrt(omega / tau_psi), size=1)
 
     rho = psi_omega_to_rho(psi, omega)
