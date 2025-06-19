@@ -152,7 +152,7 @@ def sample_parameters():
 
 # Gruszka and Szwabiński, 2022
 def estimate_heston(S: pd.Series, dt, ns, N):
-    n = len(S) - 1
+    n = len(S)
     mu_prior_eta = 1.00125
     sigma_prior_eta = 0.001
     precision_prior_vol = np.array([[10, 0], [0, 5]])
@@ -183,9 +183,24 @@ def estimate_heston(S: pd.Series, dt, ns, N):
     R = S[1:] / S[:-1]
 
     for i in ns:  # MCMC
+        vt = np.zeros(n)
+        Vt = np.repeat([parameters_sample["theta"][i]], N)
+        vt[0] = np.mean(Vt)
         for k in range(1, n - 1):  # Particle Filtering
-            for j in range(1, N):
-                particle_filtering()
+            Vt = particle_filtering(
+                N,
+                R[k],
+                R[k + 1],
+                dt,
+                Vt,
+                parameters_sample["mu"][i],
+                parameters_sample["kappa"][i],
+                parameters_sample["theta"][i],
+                parameters_sample["sigma"][i],
+                parameters_sample["rho"][i],
+            )
+            vt[k] = np.mean(Vt)
+        vt[n - 1] = vt[n - 2]
         sample_parameters()
 
     mc_estimates = {
