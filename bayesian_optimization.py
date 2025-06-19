@@ -68,7 +68,7 @@ def sample_mu(rt: np.ndarray, vt: np.ndarray, dt: float, mu_eta_prior, tau_eta_p
     ols_eta = 1 / inner_x * (xt.T @ yt)
     mu_eta = 1 / tau_eta * (tau_eta_prior * mu_eta_prior + inner_x * ols_eta)
 
-    eta = stats.norm.rvs(loc=mu_eta, scale=np.sqrt(tau_eta))
+    eta = stats.norm.rvs(loc=mu_eta, scale=np.sqrt(1 / np.sqrt(tau_eta)))
     return eta_to_mu(eta)
 
 
