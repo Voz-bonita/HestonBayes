@@ -87,9 +87,9 @@ def sample_kappa_theta_sigma(
     a_sigma2_prior: float,
     b_sigma2_prior: float,
 ):
-    xt_2 = 1 / np.sqrt(dt) * np.sqrt(vt[:-1])
-    xt_1 = 1 / np.sqrt(dt) / np.sqrt(vt[:-1])
-    yt = vt[1:] * xt_1
+    xt_2 = 1 / np.sqrt(dt) * np.sqrt(vt[1:-1])
+    xt_1 = 1 / np.sqrt(dt) / np.sqrt(vt[1:-1])
+    yt = vt[2:] * xt_1
 
     xt = np.array([xt_1, xt_2]).T
 
