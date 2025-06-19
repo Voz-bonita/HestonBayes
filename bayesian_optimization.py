@@ -7,23 +7,20 @@ dt = 1
 
 
 def particle_filtering(
-    N: int, Rt: np.ndarray, dt, Vt_past, mu, kappa, theta, sigma, rho
+    N: int, Rtk: float, Rtk_1: float, dt, Vt_past, mu, kappa, theta, sigma, rho
 ):
-    n = Rt.shape[0]
-    epsilon = stats.norm.rvs(size=n - 1)
+    epsilon = stats.norm.rvs(size=N)
 
-    zt = (Rt[1:] - mu * dt - 1) / np.sqrt(dt, Vt_past[:-1])
+    zt = (Rtk - mu * dt - 1) / np.sqrt(dt, Vt_past)
     wt = zt * rho + epsilon * np.sqrt(1 - rho**2)
 
     Vt_candidates = (
-        Vt_past[:-1]
-        + kappa * (theta - Vt_past[:-1]) * dt
-        + sigma * np.sqrt(dt * Vt_past[:-1]) * wt
+        Vt_past + kappa * (theta - Vt_past) * dt + sigma * np.sqrt(dt * Vt_past) * wt
     )
     Wt_prob = (
         1
         / np.sqrt(2 * np.pi * Vt_candidates * dt)
-        * np.exp(-1 / 2 * (Rt[1:] * dt - mu * dt - 1) ** 2 / Vt_candidates / dt)
+        * np.exp(-1 / 2 * (Rtk_1 - mu * dt - 1) ** 2 / Vt_candidates / dt)
     )
     Wt_prob /= np.sum(Wt_prob)
 
