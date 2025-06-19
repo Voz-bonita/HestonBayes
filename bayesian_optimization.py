@@ -31,7 +31,9 @@ def particle_filtering(
     sampled_probabilities = stats.uniform.rvs(size=N)
     Vt_refined = np.zeros(N)
     for i, prob in enumerate(sampled_probabilities):
-        j = np.argmax(prob > Wt_sorted_cumsum)
+        j = np.argmin(prob > Wt_sorted_cumsum)
+        if j != 0:
+            j -= 1
         W_j = Ut_sorted[j, 1]
         W_j1 = Ut_sorted[j + 1, 1]
         V_j = Ut_sorted[j, 0]
