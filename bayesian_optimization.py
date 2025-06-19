@@ -94,7 +94,7 @@ def sample_kappa_theta_sigma(
     xt_1 = 1 / np.sqrt(dt) / np.sqrt(vt[:-1])
     yt = vt[1:] * xt_1
 
-    xt = np.array([xt_1, xt_2]).reshape((-1, 2))
+    xt = np.array([xt_1, xt_2]).T
 
     gram_matrix = xt.T @ xt
     inv_gram_matrix = np.linalg.inv(gram_matrix)
@@ -144,7 +144,7 @@ def sample_rho(
     volatility_residuals = (
         vt[1:] - vt[:-1] - kappa * (theta - vt[:-1]) * dt
     ) / np.sqrt(dt * vt[:-1])
-    residuals = np.array([price_residuals, volatility_residuals]).reshape((-1, 2))
+    residuals = np.array([price_residuals, volatility_residuals]).T
 
     A = residuals.T @ residuals
     tau_psi = A[0, 0] + tau_prior_psi
