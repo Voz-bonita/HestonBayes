@@ -3,9 +3,6 @@ import pandas as pd
 from scipy import stats
 
 
-dt = 1
-
-
 def particle_filtering(
     N: int, Rtk: float, Rtk_1: float, dt, Vt_past, mu, kappa, theta, sigma, rho
 ):
@@ -55,7 +52,7 @@ def particle_filtering(
     return Vt_refined
 
 
-def eta_to_mu(eta):
+def eta_to_mu(eta, dt):
     return (eta - 1) / dt
 
 
@@ -69,14 +66,14 @@ def sample_mu(rt: np.ndarray, vt: np.ndarray, dt: float, mu_eta_prior, tau_eta_p
     mu_eta = 1 / tau_eta * (tau_eta_prior * mu_eta_prior + inner_x * ols_eta)
 
     eta = stats.norm.rvs(loc=mu_eta, scale=np.sqrt(1 / np.sqrt(tau_eta)))
-    return eta_to_mu(eta)
+    return eta_to_mu(eta, dt)
 
 
 def beta2_to_kappa(beta2):
     return (1 - beta2) / dt
 
 
-def beta1_to_theta(beta1, kappa):
+def beta1_to_theta(beta1, kappa, dt):
     return beta1 / kappa / dt
 
 
@@ -110,8 +107,8 @@ def sample_kappa_theta_sigma(
     betas = stats.multivariate_normal.rvs(
         mean=mu_beta, cov=sigma2_past * inv_precision_beta, size=1
     )
-    kappa = beta2_to_kappa(betas[1])
-    theta = beta1_to_theta(betas[0], kappa)
+    kappa = beta2_to_kappa(betas[1], dt)
+    theta = beta1_to_theta(betas[0], kappa, dt)
 
     a_sigma2 = a_sigma2_prior + n / 2
     b_sigma2 = b_sigma2_prior + 1 / 2 * (
