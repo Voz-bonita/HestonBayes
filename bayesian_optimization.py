@@ -199,7 +199,7 @@ def estimate_heston(S: pd.Series, dt, ns, N):
         vt = np.zeros(n + 1)
         Vt = np.repeat([parameters_sample["theta"][i]], N)
         vt[0] = np.mean(Vt)
-        for k in range(1, n - 1):  # Particle Filtering
+        for k in range(0, n - 1):  # Particle Filtering
             Vt = particle_filtering(
                 N,
                 R[k],
@@ -212,7 +212,7 @@ def estimate_heston(S: pd.Series, dt, ns, N):
                 parameters_sample["sigma"][i],
                 parameters_sample["rho"][i],
             )
-            vt[k] = np.mean(Vt)
+            vt[k + 1] = np.mean(Vt)
         vt[n] = vt[n - 1]
         sample_parameters()
 
