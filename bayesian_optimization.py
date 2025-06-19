@@ -107,7 +107,9 @@ def sample_kappa_theta_sigma(
         precision_beta_prior @ mu_beta_prior + gram_matrix @ ols_beta
     )
 
-    betas = stats.norm.rvs(loc=mu_beta, scale=sigma2_past * inv_precision_beta, size=2)
+    betas = stats.multivariate_normal.rvs(
+        mean=mu_beta, cov=sigma2_past * inv_precision_beta, size=1
+    )
     kappa = beta2_to_kappa(betas[1])
     theta = beta1_to_theta(betas[0], kappa)
 
