@@ -168,12 +168,18 @@ def estimate_heston(S: pd.Series, dt, ns, N):
     # sigma_prior_jump = 0.3
 
     parameters_sample = {
-        "mu": np.zeros(ns),
-        "kappa": np.zeros(ns),
-        "theta": np.zeros(ns),
-        "sigma": np.zeros(ns),
-        "rho": np.zeros(ns),
+        "mu": np.zeros(ns + 1),
+        "kappa": np.zeros(ns + 1),
+        "theta": np.zeros(ns + 1),
+        "sigma": np.zeros(ns + 1),
+        "rho": np.zeros(ns + 1),
     }
+    parameters_sample["mu"][0] = 0.1
+    parameters_sample["theta"][0] = 0.05
+    parameters_sample["kappa"][0] = 1
+    parameters_sample["sigma"][0] = 0.02
+    parameters_sample["rho"][0] = -0.1
+
     R = S[1:] / S[:-1]
 
     for i in ns:  # MCMC
