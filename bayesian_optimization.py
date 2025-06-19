@@ -38,10 +38,19 @@ def particle_filtering(
         W_j1 = Ut_sorted[j + 1, 1]
         V_j = Ut_sorted[j, 0]
         V_j1 = Ut_sorted[j + 1, 0]
-        v = prob
-        if j > 1:
-            v -= Wt_sorted_cumsum[j - 2] + W_j / 2
-        v = v / (W_j / 2 + W_j1 / 2) * (V_j1 - V_j) + V_j
+        V_amplitude = V_j1 - V_j
+
+        if j == 0:
+            prev_prob = 0
+            prob_avg = W_j + W_j1 / 2
+        elif j == N - 2:
+            prev_prob = Wt_sorted_cumsum[j - 1] + W_j / 2
+            prob_avg = W_j / 2 + W_j1
+        else:
+            prev_prob = Wt_sorted_cumsum[j - 1] + W_j / 2
+            prob_avg = W_j / 2 + W_j1 / 2
+
+        v = (prob - prev_prob) / prob_avg * V_amplitude + V_j
         Vt_refined[i] = v
     return Vt_refined
 
