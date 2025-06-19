@@ -69,7 +69,7 @@ def sample_mu(rt: np.ndarray, vt: np.ndarray, dt: float, mu_eta_prior, tau_eta_p
     return eta_to_mu(eta, dt)
 
 
-def beta2_to_kappa(beta2):
+def beta2_to_kappa(beta2, dt):
     return (1 - beta2) / dt
 
 
