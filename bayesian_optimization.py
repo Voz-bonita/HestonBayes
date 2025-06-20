@@ -158,7 +158,7 @@ def sample_rho(
     a_omega = a_prior_omega + rt.shape[0] / 2
     b_omega = b_prior_omega + 1 / 2 * (A[1, 1] - A[0, 1] ** 2 / A[0, 0])
 
-    omega = stats.invgamma.rvs(a_omega, b_omega, size=1)
+    omega = stats.invgamma.rvs(a_omega, b_omega, size=1)[0]
     psi = stats.norm.rvs(loc=mu_psi, scale=np.sqrt(omega / tau_psi), size=1)[0]
 
     rho = psi_omega_to_rho(psi, omega)
