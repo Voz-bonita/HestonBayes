@@ -104,19 +104,28 @@ def sample_kappa_theta_sigma(
         precision_beta_prior @ mu_beta_prior + gram_matrix @ ols_beta
     )
 
-    betas = stats.multivariate_normal.rvs(
-        mean=mu_beta, cov=sigma2_past * inv_precision_beta, size=1
-    )
-    kappa = beta2_to_kappa(betas[1], dt)
-    theta = beta1_to_theta(betas[0], kappa, dt)
+    kappa, theta, sigma2 = 0, 0, 0
+    while (
+        kappa <= 0.001
+        or theta <= 0.001
+        or sigma2 <= 0.001
+        or 2 * kappa * theta <= sigma2
+        or theta >= 1
+        or kappa >= 1
+    ):
+        betas = stats.multivariate_normal.rvs(
+            mean=mu_beta, cov=sigma2_past * inv_precision_beta, size=1
+        )
+        kappa = beta2_to_kappa(betas[1], dt)
+        theta = beta1_to_theta(betas[0], kappa, dt)
 
-    a_sigma2 = a_sigma2_prior + n / 2
-    b_sigma2 = b_sigma2_prior + 1 / 2 * (
-        yt.T @ yt
-        + mu_beta_prior.T @ precision_beta_prior @ mu_beta_prior
-        - mu_beta.T @ precision_beta @ mu_beta
-    )
-    sigma2 = stats.invgamma.rvs(a_sigma2, b_sigma2, size=1)
+        a_sigma2 = a_sigma2_prior + n / 2
+        b_sigma2 = b_sigma2_prior + 1 / 2 * (
+            yt.T @ yt
+            + mu_beta_prior.T @ precision_beta_prior @ mu_beta_prior
+            - mu_beta.T @ precision_beta @ mu_beta
+        )
+        sigma2 = stats.invgamma.rvs(a_sigma2, b_sigma2, size=1)[0]
 
     return kappa, theta, sigma2
 
