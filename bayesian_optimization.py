@@ -220,7 +220,39 @@ def estimate_heston(S: pd.Series, dt, ns, N):
             )
             vt[k + 1] = np.mean(Vt)
         vt[n] = vt[n - 1]
-        sample_parameters()
+        mu_i = sample_mu(R, vt, dt, mu_prior_eta, 1 / sigma_prior_eta**2)
+        (
+            kappa_i,
+            theta_i,
+            sigma2_i,
+        ) = sample_kappa_theta_sigma(
+            vt,
+            dt,
+            n,
+            mu_prior_vol,
+            precision_prior_vol,
+            parameters_sample["sigma"][i],
+            a_prior_sigma,
+            b_prior_sigma,
+        )
+        rho_i = sample_rho(
+            R,
+            vt,
+            dt,
+            parameters_sample["mu"][i + 1],
+            parameters_sample["kappa"][i + 1],
+            parameters_sample["theta"][i + 1],
+            mu_prior_psi,
+            1 / sigma_prior_psi**2,
+            a_prior_omega,
+            b_prior_omgea,
+        )
+
+        parameters_sample["mu"][i + 1] = mu_i
+        parameters_sample["kappa"][i + 1] = kappa_i
+        parameters_sample["theta"][i + 1] = theta_i
+        parameters_sample["sigma"][i + 1] = sigma2_i
+        parameters_sample["rho"][i + 1] = rho_i
 
     mc_estimates = {
         parameter: np.mean(sample) for parameter, sample in parameters_sample.items()
