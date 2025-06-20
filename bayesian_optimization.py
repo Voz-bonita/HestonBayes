@@ -48,6 +48,7 @@ def particle_filtering(
             prob_avg = W_j / 2 + W_j1 / 2
 
         v = (prob - prev_prob) / prob_avg * V_amplitude + V_j
+        assert not np.isnan(v) and not v <= 0, "Particle Filtering went wrong"
         Vt_refined[i] = v
     return Vt_refined
 
