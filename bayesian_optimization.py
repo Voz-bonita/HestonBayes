@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from scipy import stats
+from tqdm import tqdm
 
 
 def particle_filtering(
@@ -202,7 +203,7 @@ def estimate_heston(S: pd.Series, dt, ns, N):
     R = S[1:] / S[:-1]
     n = len(R)
 
-    for i in range(ns):  # MCMC
+    for i in tqdm(range(ns)):  # MCMC
         vt = np.zeros(n + 1)
         Vt = np.repeat([parameters_sample["theta"][i]], N)
         vt[0] = np.mean(Vt)
