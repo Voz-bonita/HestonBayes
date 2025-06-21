@@ -5,7 +5,7 @@ from tqdm import tqdm
 
 
 def particle_filtering(
-    N: int, Rtk: float, Rtk_1: float, dt, Vt_past, mu, kappa, theta, sigma, rho
+    N: int, Rtk: float, Rtk_1: float, dt, Vt_past, mu, kappa, theta, sigma2, rho
 ):
     epsilon = stats.norm.rvs(size=N)
 
@@ -13,7 +13,7 @@ def particle_filtering(
     wt = zt * rho + epsilon * np.sqrt(1 - rho**2)
 
     Vt_candidates = (
-        Vt_past + kappa * (theta - Vt_past) * dt + sigma * np.sqrt(dt * Vt_past) * wt
+        Vt_past + kappa * (theta - Vt_past) * dt + np.sqrt(sigma2 * dt * Vt_past) * wt
     )
     Wt_prob = (
         1
