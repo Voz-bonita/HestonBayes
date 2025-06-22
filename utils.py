@@ -19,5 +19,5 @@ def plot_wealth(dates, values, labels, title, path):
     plt.grid(True)
     plt.tight_layout()
 
-    plt.savefig(path, dpi=300, bbox_inches="tight")
+    plt.savefig(path, dpi=300, bbox_inches="tight", transparent=True)
     plt.close()
