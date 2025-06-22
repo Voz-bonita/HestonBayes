@@ -5,7 +5,7 @@ import matplotlib.dates as mdates
 def plot_wealth(dates, values, labels, title, path):
     plt.figure(figsize=(10, 6))
     for array, label in zip(values, labels):
-        plt.plot(dates, array, label, marker="o")
+        plt.plot(dates, array, label=label, marker="o")
 
     # Formatting the date axis
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
