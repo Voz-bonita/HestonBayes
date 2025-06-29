@@ -173,10 +173,10 @@ def sample_parameters():
 
 # Gruszka and Szwabiński, 2022
 def estimate_heston(S: pd.Series, dt, ns, N):
-    mu_prior_eta = 1.00125
+    mu_prior_eta = 1.0004
     sigma_prior_eta = 0.001
     precision_prior_vol = np.array([[10, 0], [0, 5]])
-    mu_prior_vol = np.array([35e-6, 0.988])
+    mu_prior_vol = np.array([0.05, 0.01])
     a_prior_sigma = 149
     b_prior_sigma = 0.025
     mu_prior_psi = -0.45
